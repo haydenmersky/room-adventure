@@ -54,10 +54,13 @@ private static void handleTake(String noun){
 private static void setupGame(){
     Room room1 = new Room("Room 1");
     Room room2 = new Room("Room 2");
+    Room room3 = new Room("Room 3");
+    Room room4 = new Room("Room 4");
    
 
-    String[] room1ExitDirections = {"east", "west"};
-    Room[] room1ExitDestinations = {room2};
+    // Room 1 setup
+    String[] room1ExitDirections = {"east", "south"};
+    Room[] room1ExitDestinations = {room2, room4};
     String[] room1Items = {"chair", "desk"};
     String[] room1ItemDescriptions = {"A wooden chair", "A sturdy desk"};
     String[] room1Grabbables = {"key"};
@@ -67,8 +70,9 @@ private static void setupGame(){
     room1.setItemDescriptions(room1ItemDescriptions);
     room1.setGrabbables(room1Grabbables);
 
-    String[] room2ExitDirections = {"west"};
-    Room[] room2ExitDestinations = {room1}; 
+    // Room 2 setup
+    String[] room2ExitDirections = {"west", "south"};
+    Room[] room2ExitDestinations = {room1, room3}; 
     String[] room2Items = {"Fireplace", "Rug"};
     String[] room2ItemDescriptions = {"A cozy fireplace", "A soft rug"};
     String[] room2Grabbables = {"map"};
@@ -77,6 +81,30 @@ private static void setupGame(){
     room2.setItems(room2Items);
     room2.setItemDescriptions(room2ItemDescriptions);
     room2.setGrabbables(room2Grabbables);
+
+    // Room 3 setup
+    String[] room3ExitDirections = {"north", "west"};
+    Room[] room3ExitDestinations = {room2, room4}; 
+    String[] room3Items = {"Fireplace", "Rug"};
+    String[] room3ItemDescriptions = {"A cozy fireplace", "A soft rug"};
+    String[] room3Grabbables = {"map"};
+    room3.setExitDirections(room3ExitDirections);
+    room3.setExitDestinations(room3ExitDestinations);
+    room3.setItems(room3Items);
+    room3.setItemDescriptions(room3ItemDescriptions);
+    room3.setGrabbables(room3Grabbables);
+
+    // Room 4 setup
+    String[] room4ExitDirections = {"north", "east"};
+    Room[] room4ExitDestinations = {room1, room3}; 
+    String[] room4Items = {"Fireplace", "Rug"};
+    String[] room4ItemDescriptions = {"A cozy fireplace", "A soft rug"};
+    String[] room4Grabbables = {"map"};
+    room4.setExitDirections(room4ExitDirections);
+    room4.setExitDestinations(room4ExitDestinations);
+    room4.setItems(room4Items);
+    room4.setItemDescriptions(room4ItemDescriptions);
+    room4.setGrabbables(room4Grabbables);
 
     currentRoom = room1; // Start in room 1
 }
