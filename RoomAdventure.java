@@ -1,4 +1,8 @@
 
+// Java Room Adventure
+// Jadon Newton, Alex Orgeron, Nicholas Sanders, Hayden Mersky
+// SEE README
+
 import java.util.Scanner;
 
 public class RoomAdventure { // Main class containing game logic
@@ -52,61 +56,94 @@ private static void handleTake(String noun){
 }
 
 private static void setupGame(){
-    Room room1 = new Room("Room 1");
-    Room room2 = new Room("Room 2");
-    Room room3 = new Room("Room 3");
-    Room room4 = new Room("Room 4");
+    Room courtyard = new Room("Courtyard");
+    Room barracks = new Room("Barracks");
+    Room armory = new Room("Armory");
+    Room throneroom = new Room("Throne Room");
+    Room guardtower = new Room("Guard Tower");
+    Room gate = new Room("Gate");
    
 
-    // Room 1 setup
-    String[] room1ExitDirections = {"east", "south"};
-    Room[] room1ExitDestinations = {room2, room4};
-    String[] room1Items = {"chair", "desk"};
-    String[] room1ItemDescriptions = {"A wooden chair", "A sturdy desk"};
-    String[] room1Grabbables = {"key"};
-    room1.setExitDirections(room1ExitDirections);
-    room1.setExitDestinations(room1ExitDestinations);
-    room1.setItems(room1Items);
-    room1.setItemDescriptions(room1ItemDescriptions);
-    room1.setGrabbables(room1Grabbables);
+    // Courtyard setup
+    String[] courtyardExitDirections = {"north", "east", "south", "west"};
+    Room[] courtyardExitDestinations = {throneroom, barracks, gate, guardtower};
+    String[] courtyardItems = {"Arrows", "Dead_Knight", "Training_Dummy", "Banners"};
+    String[] courtyardItemDescriptions = {"Arrows fired by a sieging army litter the ground.", 
+                                          "A knight lies dead in the grass with arrows piercing his body; his hands still wrap around the hilt of a sword.",
+                                          "An old and battered training dummy, an arrow remains stuck in the bullseye.",
+                                          "2 banners flank a massive iron gate; you can't recall what lord they represent."};
+    String[] courtyardGrabbables = {"Sword"};
+    courtyard.setExitDirections(courtyardExitDirections);
+    courtyard.setExitDestinations(courtyardExitDestinations);
+    courtyard.setItems(courtyardItems);
+    courtyard.setItemDescriptions(courtyardItemDescriptions);
+    courtyard.setGrabbables(courtyardGrabbables);
 
-    // Room 2 setup
-    String[] room2ExitDirections = {"west", "south"};
-    Room[] room2ExitDestinations = {room1, room3}; 
-    String[] room2Items = {"Fireplace", "Rug"};
-    String[] room2ItemDescriptions = {"A cozy fireplace", "A soft rug"};
-    String[] room2Grabbables = {"map"};
-    room2.setExitDirections(room2ExitDirections);
-    room2.setExitDestinations(room2ExitDestinations);
-    room2.setItems(room2Items);
-    room2.setItemDescriptions(room2ItemDescriptions);
-    room2.setGrabbables(room2Grabbables);
+    // Barracks setup
+    String[] barracksExitDirections = {"east", "west"};
+    Room[] barracksExitDestinations = {armory, courtyard}; 
+    String[] barracksItems = {"Bunk_Beds", "Iron_Chest", "Rug"};
+    String[] barracksItemDescriptions = {"Bunk beds line the walls, it appears at least 10 knights called this barracks home.",
+                                         "At the foot of each bed lies an iron chest, but you notice one already slight ajar. Upon opening the chest you find a key (take key).",
+                                         "A simple, dirt-covered rug covers most of the floor."};
+    String[] barracksGrabbables = {"Key"};
+    barracks.setExitDirections(barracksExitDirections);
+    barracks.setExitDestinations(barracksExitDestinations);
+    barracks.setItems(barracksItems);
+    barracks.setItemDescriptions(barracksItemDescriptions);
+    barracks.setGrabbables(barracksGrabbables);
 
-    // Room 3 setup
-    String[] room3ExitDirections = {"north", "west"};
-    Room[] room3ExitDestinations = {room2, room4}; 
-    String[] room3Items = {"Fireplace", "Rug"};
-    String[] room3ItemDescriptions = {"A cozy fireplace", "A soft rug"};
-    String[] room3Grabbables = {"map"};
-    room3.setExitDirections(room3ExitDirections);
-    room3.setExitDestinations(room3ExitDestinations);
-    room3.setItems(room3Items);
-    room3.setItemDescriptions(room3ItemDescriptions);
-    room3.setGrabbables(room3Grabbables);
+    // Armory setup
+    String[] armoryExitDirections = {"west"};
+    Room[] armoryExitDestinations = {barracks}; 
+    String[] armoryItems = {"Weapon_Rack", "Wall_Map", "Armor_Rack"};
+    String[] armoryItemDescriptions = {"A weapon rack is bolted to the wall; while mostly empty, it still contains a couple swords identical to the one in the courtyard.", 
+                                       "A map affixed to the wall appears to give a layout of the castle. \n\t\t Throne Room\n\n Guard Tower \tCourtyard \t Barracks \tArmory\n\n\t\t Gate",
+                                       "An armor rack is bolted to the wall. Most sets are empty, but one full set of ornate, gold-trimmed plate armor still remains."};
+    String[] armoryGrabbables = {"Armor"};
+    armory.setExitDirections(armoryExitDirections);
+    armory.setExitDestinations(armoryExitDestinations);
+    armory.setItems(armoryItems);
+    armory.setItemDescriptions(armoryItemDescriptions);
+    armory.setGrabbables(armoryGrabbables);
 
-    // Room 4 setup
-    String[] room4ExitDirections = {"north", "east"};
-    Room[] room4ExitDestinations = {room1, room3}; 
-    String[] room4Items = {"Fireplace", "Rug"};
-    String[] room4ItemDescriptions = {"A cozy fireplace", "A soft rug"};
-    String[] room4Grabbables = {"map"};
-    room4.setExitDirections(room4ExitDirections);
-    room4.setExitDestinations(room4ExitDestinations);
-    room4.setItems(room4Items);
-    room4.setItemDescriptions(room4ItemDescriptions);
-    room4.setGrabbables(room4Grabbables);
+    // Throne Room setup
+    String[] throneroomExitDirections = {"north", "east"};
+    Room[] throneroomExitDestinations = {courtyard, armory}; 
+    String[] throneroomItems = {"Fireplace", "Rug"};
+    String[] throneroomItemDescriptions = {"A cozy fireplace", "A soft rug"};
+    String[] throneroomGrabbables = {"map"};
+    throneroom.setExitDirections(throneroomExitDirections);
+    throneroom.setExitDestinations(throneroomExitDestinations);
+    throneroom.setItems(throneroomItems);
+    throneroom.setItemDescriptions(throneroomItemDescriptions);
+    throneroom.setGrabbables(throneroomGrabbables);
 
-    currentRoom = room1; // Start in room 1
+    // Guard Tower setup
+    String[] guardtowerExitDirections = {"north", "east"};
+    Room[] guardtowerExitDestinations = {courtyard, armory}; 
+    String[] guardtowerItems = {"Fireplace", "Rug"};
+    String[] guardtowerItemDescriptions = {"A cozy fireplace", "A soft rug"};
+    String[] guardtowerGrabbables = {"map"};
+    guardtower.setExitDirections(guardtowerExitDirections);
+    guardtower.setExitDestinations(guardtowerExitDestinations);
+    guardtower.setItems(guardtowerItems);
+    guardtower.setItemDescriptions(guardtowerItemDescriptions);
+    guardtower.setGrabbables(guardtowerGrabbables);
+
+    // Gate setup
+    String[] gateExitDirections = {"north", "east"};
+    Room[] gateExitDestinations = {courtyard, armory}; 
+    String[] gateItems = {"Fireplace", "Rug"};
+    String[] gateItemDescriptions = {"A cozy fireplace", "A soft rug"};
+    String[] gateGrabbables = {"map"};
+    gate.setExitDirections(gateExitDirections);
+    gate.setExitDestinations(gateExitDestinations);
+    gate.setItems(gateItems);
+    gate.setItemDescriptions(gateItemDescriptions);
+    gate.setGrabbables(gateGrabbables);
+
+    currentRoom = courtyard; // Start in room 1
 }
 
 public static void main(String[] args) {
