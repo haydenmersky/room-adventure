@@ -5,6 +5,6 @@ Room adventure assignment for CSC-132
 # CONTRIBUTIONS
 
 ## Jadon Newton: Improved codebase, ########
-## Hayden Mersky: New rooms/items and theme, Fight command and combat
+## Hayden Mersky: New rooms/items and theme, Fight mechanics, player and enemy classes
 ## Alex Orgeron: ########, ########
 ## Nicholas Sanders: ########, ########
