@@ -1,6 +1,7 @@
 
 // Java Room Adventure
 // Jadon Newton, Alex Orgeron, Nicholas Sanders, Hayden Mersky
+// AI FOR DEBUGGING AND SYNTAX HELP
 // SEE README
 
 import java.util.Scanner;
