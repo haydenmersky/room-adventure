@@ -1,6 +1,7 @@
 
 // Java Room Adventure
 // Jadon Newton, Alex Orgeron, Nicholas Sanders, Hayden Mersky
+// AI FOR DEBUGGING AND SYNTAX HELP
 // SEE README
 
 import java.util.Scanner;
@@ -11,10 +12,12 @@ public class RoomAdventure { // Main class containing game logic
     private static Room currentRoom; // The room the player is currently in
     private static String[] inventory = {null, null, null, null, null}; // Player inventory slots
     private static String status; // Message to display after each action
+    private static Player player = new Player(10, 2);
+    private static Enemy mad_king = new Enemy(50, 15);
 
     // Constants
     final private static String DEFAULT_STATUS = 
-        "Sorry, I do not understand. Try [verb] [noun]. Valid verbs include 'go', 'look', and 'take'."; // Default error message
+        "Sorry, I do not understand. Try [verb] [noun]. Valid verbs include 'go', 'look', and 'take', and 'equip'."; // Default error message
 
     private static void handleGo(String noun) {
         String[] exitDirections = currentRoom.getExitDirections();
@@ -35,6 +38,10 @@ private static void handleLook(String noun){
     for (int i = 0; i < items.length; i++){
         if (noun.equals(items[i])){
             status = itemDescriptions[i];
+            if (noun.equals("Man") && currentRoom.name.equals("Outside Gate")){
+                System.out.println(status);
+                startCombat(player, mad_king);
+            }
         }
     }
 }
@@ -55,14 +62,34 @@ private static void handleTake(String noun){
     }
 }
 
+private static void handleEquip(Player player, String noun, String[] inventory){
+    status = "I can't equip that.";
+    boolean found = false; // Allows it to stop when found so it doesn't tell you 4 times that you don't have it
+
+    for (String equippable: inventory){ // For item in inventory
+        if (equippable != null && equippable.equals(noun)){ // If it isn't null and it equals what you typed
+            player.equip(noun); // Equip it
+            status = "You equipped the " + noun + ".";
+            found = true; // Change found to stop from repeating you don't have it
+            System.out.println("New Health: " + player.getHealth()); // Print new health
+            System.out.println("New Damage: " + player.getAttack()); // Print new damage
+            break;
+
+        }  
+    
+    } if (found == false){ // If you don't have it
+            status = ("You don't have a " + noun + "."); // Don't equip
+        }
+    
+}
+
 private static void setupGame(){
     Room courtyard = new Room("Courtyard");
     Room barracks = new Room("Barracks");
     Room armory = new Room("Armory");
     Room throneroom = new Room("Throne Room");
     Room guardtower = new Room("Guard Tower");
-    Room gate = new Room("Gate");
-   
+    Room gate = new Room("Outside Gate");
 
     // Courtyard setup
     String[] courtyardExitDirections = {"north", "east", "south", "west"};
@@ -99,7 +126,7 @@ private static void setupGame(){
     String[] armoryItems = {"Weapon_Rack", "Wall_Map", "Armor_Rack"};
     String[] armoryItemDescriptions = {"A weapon rack is bolted to the wall; while mostly empty, it still contains a couple swords identical to the one in the courtyard.", 
                                        "A map affixed to the wall appears to give a layout of the castle. \n\t\t Throne Room\n\n Guard Tower \tCourtyard \t Barracks \tArmory\n\n\t\t Gate",
-                                       "An armor rack is bolted to the wall. Most sets are empty, but one full set of ornate, gold-trimmed plate armor still remains."};
+                                       "An armor rack is bolted to the wall. Most sets are empty, but one full set of ornate, gold-trimmed plate armor still remains. In its chest lies an empty socket."};
     String[] armoryGrabbables = {"Armor"};
     armory.setExitDirections(armoryExitDirections);
     armory.setExitDestinations(armoryExitDestinations);
@@ -108,11 +135,13 @@ private static void setupGame(){
     armory.setGrabbables(armoryGrabbables);
 
     // Throne Room setup
-    String[] throneroomExitDirections = {"north", "east"};
-    Room[] throneroomExitDestinations = {courtyard, armory}; 
-    String[] throneroomItems = {"Fireplace", "Rug"};
-    String[] throneroomItemDescriptions = {"A cozy fireplace", "A soft rug"};
-    String[] throneroomGrabbables = {"map"};
+    String[] throneroomExitDirections = {"south"};
+    Room[] throneroomExitDestinations = {courtyard}; 
+    String[] throneroomItems = {"Throne", "Carpet", "Painting"};
+    String[] throneroomItemDescriptions = {"A gold and silver throne covered in sprawling and intricate patterns. It seems to have been inhabited very recently.",
+                                           "An ornate carpet sprawls from the entrance to the foot of the throne. It seems to bear the same patterns as the banners.",
+                                           "A massive painting covers most of the wall, seemingly depicting the royal family."};
+    String[] throneroomGrabbables = {null};
     throneroom.setExitDirections(throneroomExitDirections);
     throneroom.setExitDestinations(throneroomExitDestinations);
     throneroom.setItems(throneroomItems);
@@ -120,11 +149,12 @@ private static void setupGame(){
     throneroom.setGrabbables(throneroomGrabbables);
 
     // Guard Tower setup
-    String[] guardtowerExitDirections = {"north", "east"};
-    Room[] guardtowerExitDestinations = {courtyard, armory}; 
-    String[] guardtowerItems = {"Fireplace", "Rug"};
-    String[] guardtowerItemDescriptions = {"A cozy fireplace", "A soft rug"};
-    String[] guardtowerGrabbables = {"map"};
+    String[] guardtowerExitDirections = {"east"};
+    Room[] guardtowerExitDestinations = {courtyard}; 
+    String[] guardtowerItems = {"Spyglass, Creaky_Board"};
+    String[] guardtowerItemDescriptions = {"Picking up the spyglass, you look beyond the gate. All of the knights lay on the ground, their weapons beside them. Strangely though, when looking into one's helmet you realize all of the armor is empty.",
+                                           "You investigate the board, realizing it's lose. Upon prying it up, you find a deep blue gem; as you pick it up, it seems to hum with power (take gem)."};
+    String[] guardtowerGrabbables = {"Gem"};
     guardtower.setExitDirections(guardtowerExitDirections);
     guardtower.setExitDestinations(guardtowerExitDestinations);
     guardtower.setItems(guardtowerItems);
@@ -132,18 +162,51 @@ private static void setupGame(){
     guardtower.setGrabbables(guardtowerGrabbables);
 
     // Gate setup
-    String[] gateExitDirections = {"north", "east"};
-    Room[] gateExitDestinations = {courtyard, armory}; 
-    String[] gateItems = {"Fireplace", "Rug"};
-    String[] gateItemDescriptions = {"A cozy fireplace", "A soft rug"};
-    String[] gateGrabbables = {"map"};
+    String[] gateExitDirections = {};
+    Room[] gateExitDestinations = {}; 
+    String[] gateItems = {"Man"};
+    String[] gateItemDescriptions = {"The gate quickly slams shut behind you.\nYou see a man with a sword ahead of you, a black mist seems to be slowly crawling up his body. He emanates a royal presence, urging you to submit.\n\n"};
+    String[] gateGrabbables = {null};
     gate.setExitDirections(gateExitDirections);
     gate.setExitDestinations(gateExitDestinations);
     gate.setItems(gateItems);
     gate.setItemDescriptions(gateItemDescriptions);
     gate.setGrabbables(gateGrabbables);
 
-    currentRoom = courtyard; // Start in room 1
+    currentRoom = courtyard; // Start in courtyard
+}
+
+public static void startCombat(Player player, Enemy enemy){
+    Scanner scanner = new Scanner(System.in);
+    System.out.println("He rushes you!");
+
+    while (player.isAlive() && enemy.isAlive()){
+        System.out.println("Choose:\n1: Attack\n2: Submit");
+        String input = scanner.nextLine(); // Read user input
+
+        if (input.equals("1")){
+            // Player attacks
+            enemy.takeDamage(player.getAttack());
+
+            if (!enemy.isAlive()){
+                System.out.println("The Mad King crumples to the ground in front of you, defeated.\nYou begin to follow the road, searching for civilization.\n ---------------------GAME OVER--------------------- ");
+                System.exit(0);
+            }
+
+            // Enemy attacks back
+            player.takeDamage(enemy.getAttack());
+            if (!player.isAlive()){
+                System.out.println("The Mad King's blade pierces your skin and you fall to the ground.\nThe black mist begins to spread from your wound, and you feel it begin to corrupt you before everything fades.\n ---------------------GAME OVER--------------------- ");
+                System.exit(0);
+            }
+            
+        }   else if (input.equals("2")){
+            System.out.println("The Mad King's blade pierces your skin and you fall to the ground.\nThe black mist begins to spread from your wound, and you feel it begin to corrupt you before everything fades.\n ---------------------GAME OVER--------------------- ");
+            System.exit(0);
+        }   else {
+            System.out.println("Invalid Input.");
+        }
+    }
 }
 
 public static void main(String[] args) {
@@ -180,6 +243,9 @@ public static void main(String[] args) {
             case "take":
                 handleTake(noun); // Take an item
                 break;
+            case "equip":
+                handleEquip(player, noun, inventory); // Take an item
+                break;
             default:
                 status = DEFAULT_STATUS; // Print default error message
         }
@@ -193,7 +259,7 @@ public static void main(String[] args) {
 } // End of RoomAdventure class
 
 class Room { // Represents a game room
-    private String name; // Room name
+    public String name; // Room name
     private String[] exitDirections; // Directions you can go
     private Room[] exitDestinations; // Rooms reached by each direction
     private String[] items; // Items visible in the room
@@ -258,3 +324,90 @@ class Room { // Represents a game room
         return result + "\n"; //Return full description
     }
 } // End of Room class
+
+class Player {
+
+    private int health = 10; // Health without armor = 10
+    private int attack = 2; // Damage without weapon = 2
+    public boolean isAlive = true; // Start alive
+
+    // Constructor
+    public Player(int health, int attack){
+        this.health = health;
+        this.attack = attack;
+    }
+
+    // Allows you to equip the 3 equippables, granting health or damage
+    public void equip(String item){
+        if (item.equals("Sword")){
+            this.attack += 3;
+        }
+        else if (item.equals("Armor")) {
+            this.health += 10;
+        }
+        else if (item.equals("Gem")) {
+            this.health += 30;
+            this.attack += 5;
+        }
+    }
+
+    // Function to take damage and print current health
+    public void takeDamage(int dmg){
+        this.health -= dmg;
+        System.out.println("You took " + dmg + " damage.");
+        System.out.println("Health: " + this.health);
+    }
+
+    // Checks if you're alive
+    public boolean isAlive(){
+        return health > 0;
+    }
+
+    // Getters for attack and health
+    public int getAttack() {
+        return this.attack;
+    }
+
+    public int getHealth() {
+        return this.health;
+    }
+} // End of player class
+
+class Enemy {
+
+    private String name = "Mad King";
+    private int health = 50; // Health without armor = 10
+    private int attack = 15; // Damage without weapon = 2
+    public boolean isAlive = true; // Start alive
+
+    // Constructor
+    public Enemy(int health, int attack){
+        this.health = health;
+        this.attack = attack;
+    }
+
+    // Function to take damage and print current health
+    public void takeDamage(int dmg){
+        this.health -= dmg;
+        System.out.println(name + " takes " + dmg + " damage.");
+        System.out.println("Health: " + this.health + "\n");
+    }
+
+    // Checks if you're alive
+    public boolean isAlive(){
+        return health > 0;
+    }
+
+    // Getters for attack, health, and name
+    public int getAttack() {
+        return (int)(Math.random() * 5) + 8;
+    }
+
+    public int getHealth() {
+        return this.health;
+    }
+
+    public String getName() {
+        return this.name;
+    }
+}
