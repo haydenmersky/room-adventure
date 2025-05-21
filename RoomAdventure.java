@@ -83,6 +83,10 @@ private static void handleEquip(Player player, String noun, String[] inventory){
     
 }
 
+private static void handleQuit(){
+    System.exit(0);
+}
+
 private static void setupGame(){
     Room courtyard = new Room("Courtyard");
     Room barracks = new Room("Barracks");
@@ -246,6 +250,8 @@ public static void main(String[] args) {
             case "equip":
                 handleEquip(player, noun, inventory); // Take an item
                 break;
+            case "quit":
+                handleQuit();
             default:
                 status = DEFAULT_STATUS; // Print default error message
         }
