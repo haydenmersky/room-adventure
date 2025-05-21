@@ -17,7 +17,7 @@ public class RoomAdventure { // Main class containing game logic
 
     // Constants
     final private static String DEFAULT_STATUS = 
-        "Sorry, I do not understand. Try [verb] [noun]. Valid verbs include 'go', 'look', and 'take', and 'equip'."; // Default error message
+        "Sorry, I do not understand. Try [verb] [noun]. Valid verbs include 'go', 'look', and 'take', 'equip', and 'quit'."; // Default error message
 
     private static void handleGo(String noun) {
         String[] exitDirections = currentRoom.getExitDirections();
