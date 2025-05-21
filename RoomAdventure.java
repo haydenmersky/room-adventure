@@ -230,8 +230,13 @@ public static void main(String[] args) {
         String[] words = input.split(" "); // Split input into words
 
         if (words.length != 2){ // Check if input is valid
+            if (words[0].equals("quit")) {
+                handleQuit();
+            }
+            else {
             status = DEFAULT_STATUS; // Print default error message
             continue; // Skip to next iteration
+            }
         }
 
         String verb = words[0]; // First word is the verb
