@@ -17,14 +17,14 @@ public class RoomAdventure { // Main class containing game logic
 
     // Constants
     final private static String DEFAULT_STATUS = 
-        "Sorry, I do not understand. Try [verb] [noun]. Valid verbs include 'go', 'look', and 'take', and 'equip'."; // Default error message
+        "Sorry, I do not understand. Try [verb] [noun]. Valid verbs include 'go', 'look', and 'take', 'equip', and 'use'."; // Default error message
 
     private static void handleGo(String noun) {
         String[] exitDirections = currentRoom.getExitDirections();
         Room[] exitDestinations = currentRoom.getExitDestinations();
         status = "I don't see that room.";
         for (int i = 0; i < exitDirections.length; i++){
-            if (noun.equals(exitDirections[i])){
+            if (noun.equalsIgnoreCase(exitDirections[i])){
                 currentRoom = exitDestinations[i];
                 status = "Changed Room";
             }
@@ -36,9 +36,9 @@ private static void handleLook(String noun){
     String[] itemDescriptions = currentRoom.getItemDescriptions();
     status = "I don't see that item.";
     for (int i = 0; i < items.length; i++){
-        if (noun.equals(items[i])){
+        if (noun.equalsIgnoreCase(items[i])){
             status = itemDescriptions[i];
-            if (noun.equals("Man") && currentRoom.name.equals("Outside Gate")){
+            if (noun.equalsIgnoreCase("Man") && currentRoom.name.equals("Outside Gate")){
                 System.out.println(status);
                 startCombat(player, mad_king);
             }
@@ -50,7 +50,7 @@ private static void handleTake(String noun){
     String[] grabbables = currentRoom.getGrabbables();
     status = "I can't grab that.";
     for (String item : grabbables){
-        if (noun.equals(item)){
+        if (noun.equalsIgnoreCase(item)){
             for (int j = 0; j < inventory.length; j++){
                 if (inventory[j] == null){
                     inventory[j] = noun;
@@ -67,7 +67,7 @@ private static void handleEquip(Player player, String noun, String[] inventory){
     boolean found = false; // Allows it to stop when found so it doesn't tell you 4 times that you don't have it
 
     for (String equippable: inventory){ // For item in inventory
-        if (equippable != null && equippable.equals(noun)){ // If it isn't null and it equals what you typed
+        if (equippable != null && equippable.equalsIgnoreCase(noun)){ // If it isn't null and it equals what you typed
             player.equip(noun); // Equip it
             status = "You equipped the " + noun + ".";
             found = true; // Change found to stop from repeating you don't have it
@@ -83,6 +83,30 @@ private static void handleEquip(Player player, String noun, String[] inventory){
     
 }
 
+private static void handleUse(String noun) {
+    boolean found = false;
+    for (int i = 0; i < inventory.length; i++) {
+        if (noun.equalsIgnoreCase(inventory[i])) {
+            found = true;
+            if (noun.equalsIgnoreCase("Potion")) {
+                player.increaseHealth(10); // Increase health by 10
+                inventory[i] = null; // Remove from inventory since it's used
+                status = "You used a Potion and restored 10 health.";
+            } else if (noun.equalsIgnoreCase("Gem")) {
+                player.increaseHealth(20); // Increase health by 20
+                inventory[i] = null; // Remove from inventory since it's used
+                status = "You used the Gem and restored 20 health.";
+            } else {
+                status = "You can't use " + noun + ".";
+            }
+            break;
+        }
+    }
+    if (!found) {
+        status = "You don't have a " + noun + " to use.";
+    }
+}
+
 private static void setupGame(){
     Room courtyard = new Room("Courtyard");
     Room barracks = new Room("Barracks");
@@ -94,12 +118,13 @@ private static void setupGame(){
     // Courtyard setup
     String[] courtyardExitDirections = {"north", "east", "south", "west"};
     Room[] courtyardExitDestinations = {throneroom, barracks, gate, guardtower};
-    String[] courtyardItems = {"Arrows", "Dead_Knight", "Training_Dummy", "Banners"};
+    String[] courtyardItems = {"Arrows", "Dead_Knight", "Training_Dummy", "Banners", "Potion"};
     String[] courtyardItemDescriptions = {"Arrows fired by a sieging army litter the ground.", 
                                           "A knight lies dead in the grass with arrows piercing his body; his hands still wrap around the hilt of a sword.",
                                           "An old and battered training dummy, an arrow remains stuck in the bullseye.",
-                                          "2 banners flank a massive iron gate; you can't recall what lord they represent."};
-    String[] courtyardGrabbables = {"Sword"};
+                                          "2 banners flank a massive iron gate; you can't recall what lord they represent.",
+                                          "A small potion that seems to glow slightly, restorative powers are rumored.",};
+    String[] courtyardGrabbables = {"Sword", "Potion"};
     courtyard.setExitDirections(courtyardExitDirections);
     courtyard.setExitDestinations(courtyardExitDestinations);
     courtyard.setItems(courtyardItems);
@@ -137,11 +162,12 @@ private static void setupGame(){
     // Throne Room setup
     String[] throneroomExitDirections = {"south"};
     Room[] throneroomExitDestinations = {courtyard}; 
-    String[] throneroomItems = {"Throne", "Carpet", "Painting"};
+    String[] throneroomItems = {"Throne", "Carpet", "Painting", "Potion"};
     String[] throneroomItemDescriptions = {"A gold and silver throne covered in sprawling and intricate patterns. It seems to have been inhabited very recently.",
                                            "An ornate carpet sprawls from the entrance to the foot of the throne. It seems to bear the same patterns as the banners.",
-                                           "A massive painting covers most of the wall, seemingly depicting the royal family."};
-    String[] throneroomGrabbables = {null};
+                                           "A massive painting covers most of the wall, seemingly depicting the royal family.",
+                                           "A small potion that seems to glow slightly, restorative powers are rumored."};
+    String[] throneroomGrabbables = {"Potion"};
     throneroom.setExitDirections(throneroomExitDirections);
     throneroom.setExitDestinations(throneroomExitDestinations);
     throneroom.setItems(throneroomItems);
@@ -184,7 +210,7 @@ public static void startCombat(Player player, Enemy enemy){
         System.out.println("Choose:\n1: Attack\n2: Submit");
         String input = scanner.nextLine(); // Read user input
 
-        if (input.equals("1")){
+        if (input.equalsIgnoreCase("1")){
             // Player attacks
             enemy.takeDamage(player.getAttack());
 
@@ -200,7 +226,7 @@ public static void startCombat(Player player, Enemy enemy){
                 System.exit(0);
             }
             
-        }   else if (input.equals("2")){
+        }   else if (input.equalsIgnoreCase("2")){
             System.out.println("The Mad King's blade pierces your skin and you fall to the ground.\nThe black mist begins to spread from your wound, and you feel it begin to corrupt you before everything fades.\n ---------------------GAME OVER--------------------- ");
             System.exit(0);
         }   else {
@@ -233,18 +259,21 @@ public static void main(String[] args) {
         String verb = words[0]; // First word is the verb
         String noun = words[1]; // Second word is the noun
 
-        switch (verb) { // Handle different verbs
+        switch (verb.toLowerCase()) { // Handle different verbs
             case "go":
-                handleGo(noun); // Move to another room
+                handleGo(noun.toLowerCase()); // Move to another room
                 break;
             case "look":
-                handleLook(noun); // Look at an item
+                handleLook(noun.toLowerCase()); // Look at an item
                 break;
             case "take":
-                handleTake(noun); // Take an item
+                handleTake(noun.toLowerCase()); // Take an item
                 break;
             case "equip":
-                handleEquip(player, noun, inventory); // Take an item
+                handleEquip(player, noun.toLowerCase(), inventory); // Take an item
+                break;
+            case "use":
+                handleUse(noun.toLowerCase());
                 break;
             default:
                 status = DEFAULT_STATUS; // Print default error message
@@ -339,13 +368,13 @@ class Player {
 
     // Allows you to equip the 3 equippables, granting health or damage
     public void equip(String item){
-        if (item.equals("Sword")){
+        if (item.equalsIgnoreCase("Sword")){
             this.attack += 3;
         }
-        else if (item.equals("Armor")) {
+        else if (item.equalsIgnoreCase("Armor")) {
             this.health += 10;
         }
-        else if (item.equals("Gem")) {
+        else if (item.equalsIgnoreCase("Gem")) {
             this.health += 30;
             this.attack += 5;
         }
@@ -356,6 +385,12 @@ class Player {
         this.health -= dmg;
         System.out.println("You took " + dmg + " damage.");
         System.out.println("Health: " + this.health);
+    }
+
+    public void increaseHealth(int amount){
+        this.health += amount;
+        System.out.println("You restored "+ amount + " health.");
+        System.out.println("Current Health: " + this.health);
     }
 
     // Checks if you're alive
