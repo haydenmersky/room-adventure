@@ -17,7 +17,7 @@ public class RoomAdventure { // Main class containing game logic
 
     // Constants
     final private static String DEFAULT_STATUS = 
-        "Sorry, I do not understand. Try [verb] [noun]. Valid verbs include 'go', 'look', and 'take', 'equip', and 'quit'."; // Default error message
+        "Sorry, I do not understand. Try [verb] [noun]. Valid verbs include 'go', 'look', 'take', 'equip', 'help', and 'quit'."; // Default error message
 
     private static void handleGo(String noun) {
         String[] exitDirections = currentRoom.getExitDirections();
@@ -81,6 +81,16 @@ private static void handleEquip(Player player, String noun, String[] inventory){
             status = ("You don't have a " + noun + "."); // Don't equip
         }
     
+}
+
+private static void handleHelp(){
+    System.out.println("Valid commands:");
+    System.out.println("go [direction]  - Move to another location.");
+    System.out.println("look [item]     - Look at an item to get a description of it.");
+    System.out.println("take [item]     - Take an item and add it to your inventory.");
+    System.out.println("equip [item]    - Equip an item from your inventory.");
+    System.out.println("help            - Lists all possible actions.");
+    System.out.println("quit            - Quit the game.");
 }
 
 private static void handleQuit(){
@@ -232,6 +242,11 @@ public static void main(String[] args) {
         if (words.length != 2){ // Check if input is valid
             if (words[0].equals("quit")) {
                 handleQuit();
+                continue;
+            }
+            else if (words[0].equals("help")) {
+                handleHelp();
+                continue;
             }
             else {
             status = DEFAULT_STATUS; // Print default error message
@@ -255,6 +270,8 @@ public static void main(String[] args) {
             case "equip":
                 handleEquip(player, noun, inventory); // Take an item
                 break;
+            case "help":
+                handleHelp();
             case "quit":
                 handleQuit();
             default:
