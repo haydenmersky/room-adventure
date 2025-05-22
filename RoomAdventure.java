@@ -107,6 +107,20 @@ private static void handleUse(String noun) {
     }
 }
 
+private static void handleHelp(){
+    System.out.println("Valid commands:");
+    System.out.println("go [direction]  - Move to another location.");
+    System.out.println("look [item]     - Look at an item to get a description of it.");
+    System.out.println("take [item]     - Take an item and add it to your inventory.");
+    System.out.println("equip [item]    - Equip an item from your inventory.");
+    System.out.println("help            - Lists all possible actions.");
+    System.out.println("quit            - Quit the game.");
+}
+
+private static void handleQuit(){
+    System.exit(0);
+}
+
 private static void setupGame(){
     Room courtyard = new Room("Courtyard");
     Room barracks = new Room("Barracks");
@@ -252,8 +266,18 @@ public static void main(String[] args) {
         String[] words = input.split(" "); // Split input into words
 
         if (words.length != 2){ // Check if input is valid
+            if (words[0].equals("quit")) {
+                handleQuit();
+                continue;
+            }
+            else if (words[0].equals("help")) {
+                handleHelp();
+                continue;
+            }
+            else {
             status = DEFAULT_STATUS; // Print default error message
             continue; // Skip to next iteration
+            }
         }
 
         String verb = words[0]; // First word is the verb
@@ -274,6 +298,12 @@ public static void main(String[] args) {
                 break;
             case "use":
                 handleUse(noun.toLowerCase());
+                break;
+            case "help":
+                handleHelp();
+                break;
+            case "quit":
+                handleQuit();
                 break;
             default:
                 status = DEFAULT_STATUS; // Print default error message
