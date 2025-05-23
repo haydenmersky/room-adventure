@@ -3,14 +3,69 @@
 // Jadon Newton, Alex Orgeron, Nicholas Sanders, Hayden Mersky
 // AI FOR DEBUGGING AND SYNTAX HELP
 // SEE README
-
 import java.util.Scanner;
+
+
+import java.io.Serializable;
+
+class Inventory implements Serializable {
+    private String[] items;
+
+    public Inventory(int size) {
+        items = new String[size];
+    }
+    
+    // End of RoomAdventure class
+
+    public boolean addItem(String item) {
+        for (int i = 0; i < items.length; i++) {
+            if (items[i] == null) {
+                items[i] = item;
+                return true;
+            }
+        }
+        return false; // Inventory full
+    }
+
+    public boolean removeItem(String item) {
+        for (int i = 0; i < items.length; i++) {
+            if (items[i] != null && items[i].equalsIgnoreCase(item)) {
+                items[i] = null;
+                return true;
+            }
+        }
+        return false; // Item not found
+    }
+
+    public boolean contains(String item) {
+        for (String i : items) {
+            if (i != null && i.equalsIgnoreCase(item)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    public void display() {
+        System.out.print("Inventory: ");
+        for (String item : items) {
+            if (item != null) {
+                System.out.print(item + " ");
+            }
+        }
+        System.out.println();
+    }
+
+    public String[] getItems() {
+        return items;
+    }
+}
 
 public class RoomAdventure { // Main class containing game logic
 
     // Class variables
     private static Room currentRoom; // The room the player is currently in
-    private static String[] inventory = {null, null, null, null, null}; // Player inventory slots
+    private static Inventory inventory = new Inventory(5); // Player inventory slots
     private static String status; // Message to display after each action
     private static Player player = new Player(10, 2);
     private static Enemy mad_king = new Enemy(50, 15);
@@ -18,7 +73,12 @@ public class RoomAdventure { // Main class containing game logic
     // Constants
     final private static String DEFAULT_STATUS = 
         "Sorry, I do not understand. Try [verb] [noun]. Valid verbs include 'go', 'look', and 'take', 'equip', and 'use'."; // Default error message
-
+ 
+        public void displayWelcomeMessage() {
+        System.out.println("Welcome to the Room Adventure Game!");
+        System.out.println("You are in a mysterious castle. Explore, find items, and defeat the Mad King!");
+        System.out.println("Type 'help' for a list of commands.");
+    }
     private static void handleGo(String noun) {
         String[] exitDirections = currentRoom.getExitDirections();
         Room[] exitDestinations = currentRoom.getExitDestinations();
@@ -51,9 +111,8 @@ private static void handleTake(String noun){
     status = "I can't grab that.";
     for (String item : grabbables){
         if (noun.equalsIgnoreCase(item)){
-            for (int j = 0; j < inventory.length; j++){
-                if (inventory[j] == null){
-                    inventory[j] = noun;
+            for (int j = 0; j < 5; j++){
+                if (inventory.addItem(noun)) {
                     status = "Added it to inventory";
                     break;
                 }
@@ -62,11 +121,11 @@ private static void handleTake(String noun){
     }
 }
 
-private static void handleEquip(Player player, String noun, String[] inventory){
+private static void handleEquip(Player player, String noun, Inventory inventory){
     status = "I can't equip that.";
     boolean found = false; // Allows it to stop when found so it doesn't tell you 4 times that you don't have it
 
-    for (String equippable: inventory){ // For item in inventory
+    for (String equippable: inventory.getItems()){ // For item in inventory
         if (equippable != null && equippable.equalsIgnoreCase(noun)){ // If it isn't null and it equals what you typed
             player.equip(noun); // Equip it
             status = "You equipped the " + noun + ".";
@@ -84,25 +143,19 @@ private static void handleEquip(Player player, String noun, String[] inventory){
 }
 
 private static void handleUse(String noun) {
-    boolean found = false;
-    for (int i = 0; i < inventory.length; i++) {
-        if (noun.equalsIgnoreCase(inventory[i])) {
-            found = true;
-            if (noun.equalsIgnoreCase("Potion")) {
-                player.increaseHealth(10); // Increase health by 10
-                inventory[i] = null; // Remove from inventory since it's used
-                status = "You used a Potion and restored 10 health.";
-            } else if (noun.equalsIgnoreCase("Gem")) {
-                player.increaseHealth(20); // Increase health by 20
-                inventory[i] = null; // Remove from inventory since it's used
-                status = "You used the Gem and restored 20 health.";
-            } else {
-                status = "You can't use " + noun + ".";
-            }
-            break;
+    if (inventory.contains(noun)) {
+        if (noun.equalsIgnoreCase("Potion")) {
+            player.increaseHealth(10); // Increase health by 10
+            inventory.removeItem(noun); // Remove from inventory since it's used
+            status = "You used a Potion and restored 10 health.";
+        } else if (noun.equalsIgnoreCase("Gem")) {
+            player.increaseHealth(20); // Increase health by 20
+            inventory.removeItem(noun); // Remove from inventory since it's used
+            status = "You used the Gem and restored 20 health.";
+        } else {
+            status = "You can't use " + noun + ".";
         }
-    }
-    if (!found) {
+    } else {
         status = "You don't have a " + noun + " to use.";
     }
 }
@@ -251,32 +304,25 @@ public static void startCombat(Player player, Enemy enemy){
 
 public static void main(String[] args) {
     setupGame();
-
-    while (true){
+    while (true) {
         System.out.println(currentRoom.toString()); // Print current room
-        System.out.print("Inventory: "); // Print status message
-
-        for (int i = 0; i < inventory.length; i++){
-            System.out.print(inventory[i] + " "); // Print inventory
-        }
+        inventory.display(); // Use Inventory class to display inventory
 
         System.out.println("\nWhat would you like to do?"); // Prompt for action
         Scanner s = new Scanner(System.in);
         String input = s.nextLine(); // Read user input
         String[] words = input.split(" "); // Split input into words
 
-        if (words.length != 2){ // Check if input is valid
+        if (words.length != 2) { // Check if input is valid
             if (words[0].equals("quit")) {
                 handleQuit();
                 continue;
-            }
-            else if (words[0].equals("help")) {
+            } else if (words[0].equals("help")) {
                 handleHelp();
                 continue;
-            }
-            else {
-            status = DEFAULT_STATUS; // Print default error message
-            continue; // Skip to next iteration
+            } else {
+                status = DEFAULT_STATUS; // Print default error message
+                continue; // Skip to next iteration
             }
         }
 
@@ -290,11 +336,11 @@ public static void main(String[] args) {
             case "look":
                 handleLook(noun.toLowerCase()); // Look at an item
                 break;
+            case "equip":
+                handleEquip(player, noun.toLowerCase(), inventory); // Equip an item
+                break;
             case "take":
                 handleTake(noun.toLowerCase()); // Take an item
-                break;
-            case "equip":
-                handleEquip(player, noun.toLowerCase(), inventory); // Take an item
                 break;
             case "use":
                 handleUse(noun.toLowerCase());
@@ -475,4 +521,6 @@ class Enemy {
     public String getName() {
         return this.name;
     }
+
+
 }
